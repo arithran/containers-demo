@@ -21,6 +21,7 @@ type User struct {
 var db = map[string]User{}
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+	// 1.Decode Payload
 	u := User{}
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
@@ -28,6 +29,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 2.External Call to Passwords Service
 	resp, err := http.Get(fmt.Sprintf("%s/passwords/hash/%s", servicePasswordAddress, u.Password))
 	if err != nil {
 		sendJSONResponse(w, newResponse("password service is unavailable"), http.StatusServiceUnavailable)
@@ -37,7 +39,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		sendJSONResponse(w, newResponse("error status "+resp.Status), http.StatusBadRequest)
 		return
 	}
-
 	defer resp.Body.Close()
 	out := Response{}
 	err = json.NewDecoder(resp.Body).Decode(&out)
@@ -46,16 +47,21 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	u.Password = out.Message
 
-	// save to db
+	// 3.Save to Database
 	db[u.Email] = u
+
+	// 4. Write Response
 	sendJSONResponse(w, u, http.StatusCreated)
 }
 
 func ListUsers(w http.ResponseWriter, r *http.Request) {
+	// 1. Select all from Database
 	res := make([]User, 0, len(db))
 	for _, u := range db {
 		res = append(res, u)
 	}
+
+	// 2. Write Response
 	sendJSONResponse(w, res, http.StatusOK)
 }
 
