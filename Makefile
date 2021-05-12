@@ -17,11 +17,11 @@ run-passwords:
 # 2. Let's build container images
 docker-build-users:
 	@echo "===>  Building Users Docker Image"
-	cd ./service-users && 	CGO_ENABLED=0 GOOS=linux GARCH=amd64 go build -o app-linux $(MAINFILES) && docker build -t service-users .
+	cd ./service-users && CGO_ENABLED=0 GOOS=linux GARCH=amd64 go build -o app-linux $(MAINFILES) && docker build -t service-users .
 
 docker-build-passwords:
 	@echo "===>  Building Passwords Docker Image"
-	cd ./service-passwords && 	CGO_ENABLED=0 GOOS=linux GARCH=amd64 go build -o app-linux $(MAINFILES) && docker build -t service-passwords .
+	cd ./service-passwords && CGO_ENABLED=0 GOOS=linux GARCH=amd64 go build -o app-linux $(MAINFILES) && docker build -t service-passwords .
 
 
 # 3. Let's run the services inside Docker (Opps, but we have a network problem)
